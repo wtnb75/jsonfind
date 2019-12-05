@@ -1,0 +1,13 @@
+bin
+lib
+include
+share
+pyvenv.cfg
+build
+dist
+*.egg-info
+*.pyc
+__pycache__
+man
+.coverage
+cover

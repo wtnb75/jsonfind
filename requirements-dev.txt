@@ -1,0 +1,5 @@
+dirimport
+nose
+coverage
+wheel
+twine
