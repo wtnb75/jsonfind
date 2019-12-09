@@ -15,7 +15,7 @@ jobs:
       with:
         python-version: 3.8
     - name: Install dependencies
-      run: pip install wheel twine
+      run: pip install -r requirements.txt -r requirements-dev.txt
     - name: versioning
       run: "echo \"VERSION = '${GITHUB_REF##*/}'\" > jsonfind/_version.py"
     - name: build wheel
