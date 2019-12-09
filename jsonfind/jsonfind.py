@@ -12,11 +12,11 @@ import jsonpointer
 import jsonpath
 try:
     import pyjq
-except ModuleNotFoundError:
+except (ModuleNotFoundError, ImportError):
     pyjq = None
 try:
     import jsonselect
-except ModuleNotFoundError:
+except (ModuleNotFoundError, ImportError):
     jsonselect = None
 
 log = getLogger(__name__)

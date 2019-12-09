@@ -52,3 +52,9 @@ Options:
 >>> JsonFind.to_jsonpath(JsonFind.find_eq(obj, tgt))
 'c'
 ```
+
+# links
+
+- [pypi repository](https://pypi.org/project/jsonfind/)
+- [coverage report](https://wtnb75.github.io/jsonfind/)
+- [local pypi repository](https://wtnb75.github.io/jsonfind/dist/)

@@ -4,12 +4,13 @@ import click
 import json
 from logging import getLogger, basicConfig, INFO, DEBUG
 from .jsonfind import JsonFind, format_list, find_format_list
+from ._version import VERSION
 
-VERSION = '0.1'
 log = getLogger(__name__)
 
 
 @click.group(invoke_without_command=True)
+@click.version_option(VERSION)
 @click.pass_context
 def cli(ctx):
     if ctx.invoked_subcommand is None:

@@ -1,0 +1,31 @@
+name: release to pypi
+
+on:
+  push:
+    tags:
+    - '*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: setup python 3.8
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: pip install wheel twine
+    - name: versioning
+      run: "echo \"VERSION = '${GITHUB_REF##*/}'\" > jsonfind/_version.py"
+    - name: build wheel
+      run: python setup.py bdist_wheel
+    - name: check
+      run: twine check dist/*.whl
+    - name: deploy to pypi
+      run: twine upload dist/*.whl
+      env:
+        TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
+        TWINE_REPOSITORY: ${{ secrets.TWINE_REPOSITORY }}
+        TWINE_NON_INTERACTIVE: "1"
