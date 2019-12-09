@@ -3,3 +3,4 @@ nose
 coverage
 wheel
 twine
+pip2pi
