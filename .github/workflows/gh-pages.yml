@@ -23,6 +23,8 @@ jobs:
       run: dir2pi dist
     - name: merge contents
       run: cp -r dist/simple/ cover/dist/
+    - name: disable jekyll
+      run: touch cover/.nojekyll
     - name: deploy to gh-pages
       uses: peaceiris/actions-gh-pages@v2
       env:
