@@ -27,5 +27,5 @@ jobs:
       env:
         TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
-        TWINE_REPOSITORY: ${{ secrets.TWINE_REPOSITORY }}
+        TWINE_REPOSITORY_URL: ${{ secrets.TWINE_REPOSITORY_URL }}
         TWINE_NON_INTERACTIVE: "1"
