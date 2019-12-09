@@ -1,0 +1,27 @@
+name: build and deploy to gh-pages
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: setup python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: Install dependencies
+      run: pip install wheel pip2pi
+    - name: build wheel
+      run: python setup.py bdist_wheel
+    - name: create index
+      run: dir2pi dist
+    - name: deploy to gh-pages
+      uses: peaceiris/actions-gh-pages@v2
+      env:
+        ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+        PUBLISH_BRANCH: gh-pages
+        PUBLISH_DIR: ./dist/simple
