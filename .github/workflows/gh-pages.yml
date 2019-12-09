@@ -20,7 +20,7 @@ jobs:
     - name: build wheel
       run: python setup.py bdist_wheel
     - name: create index
-      run: dir2pi dist
+      run: dir2pi -S dist
     - name: merge contents
       run: cp -r dist/simple/ cover/dist/
     - name: disable jekyll
