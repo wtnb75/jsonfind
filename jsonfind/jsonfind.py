@@ -45,7 +45,7 @@ def compare_regexp(a, b):
     """
     log.debug("compare(regexp) %s %s", a, b)
     if isinstance(a, str):
-        if isinstance(b, re.Pattern):
+        if hasattr(b, "fullmatch"):
             return b.fullmatch(a) is not None
         elif isinstance(b, str):
             return re.fullmatch(b, a) is not None
@@ -66,7 +66,7 @@ def compare_regexp_substr(a, b):
     False
     """
     if isinstance(a, str):
-        if isinstance(b, re.Pattern):
+        if hasattr(b, "search"):
             return b.search(a) is not None
         elif isinstance(b, str):
             return re.search(b, a) is not None
