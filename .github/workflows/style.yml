@@ -29,6 +29,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install pyflakes pycodestyle
     - name: check coding style
-      run: pycodestyle jsonfind
+      run: pycodestyle --max-line-length=120 jsonfind
     - name: pyflakes
       run: pyflakes jsonfind/[^_]*.py
