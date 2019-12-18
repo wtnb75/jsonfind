@@ -1,10 +1,11 @@
+from ._version import VERSION
 import sys
 import functools
 import click
 import json
 from logging import getLogger, basicConfig, INFO, DEBUG
-from .jsonfind import JsonFind, format_list, find_format_list, EQ, IS, compare_regexp, compare_regexp_substr, compare_eval, compare_fnmatch, compare_range, IN1, IN2
-from ._version import VERSION
+from .jsonfind import JsonFind, format_list, find_format_list, EQ, IS, IN1, IN2
+from .jsonfind import compare_regexp, compare_regexp_substr, compare_eval, compare_fnmatch, compare_range
 
 log = getLogger(__name__)
 
