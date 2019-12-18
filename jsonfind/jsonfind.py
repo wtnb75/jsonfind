@@ -59,6 +59,44 @@ def IS(a, b):
     return a is b
 
 
+def IN1(a, b):
+    """
+    >>> IN1(1, [1,2,3])
+    True
+    >>> IN1([1,2,3], 1)
+    False
+    >>> IN1(1, [2,3])
+    False
+    >>> IN1("abc", "hello abc world")
+    True
+    >>> IN1("xyz", "hello abc world")
+    False
+    """
+    try:
+        return a in b
+    except TypeError:
+        return False
+
+
+def IN2(a, b):
+    """
+    >>> IN2(1, [1,2,3])
+    False
+    >>> IN2([1,2,3], 1)
+    True
+    >>> IN2([2,3], 1)
+    False
+    >>> IN2("hello abc world", "abc")
+    True
+    >>> IN2("hello abc world", "xyz")
+    False
+    """
+    try:
+        return b in a
+    except TypeError:
+        return False
+
+
 def compare_regexp(a, b):
     """
     >>> compare_regexp("abcde", "bcd")

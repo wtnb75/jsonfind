@@ -3,7 +3,7 @@ import functools
 import click
 import json
 from logging import getLogger, basicConfig, INFO, DEBUG
-from .jsonfind import JsonFind, format_list, find_format_list, EQ, IS, compare_regexp, compare_regexp_substr, compare_eval, compare_fnmatch, comapre_range
+from .jsonfind import JsonFind, format_list, find_format_list, EQ, IS, compare_regexp, compare_regexp_substr, compare_eval, compare_fnmatch, compare_range, IN1, IN2
 from ._version import VERSION
 
 log = getLogger(__name__)
@@ -121,6 +121,8 @@ def find_regex(verbose, obj, target, format):
 compare_fn = {
     "eq": EQ,
     "is": IS,
+    "in1": IN1,
+    "in2": IN2,
     "match": compare_regexp,
     "sub": compare_regexp_substr,
     "eval": compare_eval,
