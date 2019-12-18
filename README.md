@@ -11,22 +11,28 @@
 Usage: jsonfind [OPTIONS] COMMAND [ARGS]...
 
 Options:
-  --help  Show this message and exit.
+  --version  Show the version and exit.
+  --help     Show this message and exit.
 
 Commands:
+  find-any
   find-by
   find-eq
   find-is
   find-key
+  find-regex
   find-subset
 
-# jsonfind find-eq --help
-Usage: jsonfind find-eq [OPTIONS] [OBJ]
+# jsonfind find-any --help
+Usage: jsonfind find-any [OPTIONS] [OBJ]
 
 Options:
   --verbose / --no-verbose
   --target TEXT                   query(JSON string)  [required]
   --format [jsonpath|jsonpointer]
+  --key [eq|is|in1|in2|match|sub|eval|fnmatch|range]
+  --value [eq|is|in1|in2|match|sub|eval|fnmatch|range]
+  --mode [sub|super|set]
   --help                          Show this message and exit.
 ```
 

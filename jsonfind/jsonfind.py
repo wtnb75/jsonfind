@@ -7,6 +7,7 @@
 'c'
 """
 import re
+import fnmatch
 from logging import getLogger
 import jsonpointer
 import jsonpath
@@ -23,11 +24,77 @@ log = getLogger(__name__)
 
 
 def EQ(a, b):
+    """
+    >>> EQ(1, 2)
+    False
+    >>> EQ(1, 1)
+    True
+    >>> EQ("abc", "abc")
+    True
+    >>> EQ("abc", "def")
+    False
+    >>> EQ({"a":"b"}, {"a":"b"})
+    True
+    >>> EQ({"a":"b"}, {"a":"c"})
+    False
+    """
     return a == b
 
 
 def IS(a, b):
+    """
+    >>> IS(1, 2)
+    False
+    >>> IS(1, 1)
+    True
+    >>> IS("abc", "abc")
+    True
+    >>> IS("abc", "def")
+    False
+    >>> IS({"a":"b"}, {"a":"b"})
+    False
+    >>> IS({"a":"b"}, {"a":"c"})
+    False
+    """
     return a is b
+
+
+def IN1(a, b):
+    """
+    >>> IN1(1, [1,2,3])
+    True
+    >>> IN1([1,2,3], 1)
+    False
+    >>> IN1(1, [2,3])
+    False
+    >>> IN1("abc", "hello abc world")
+    True
+    >>> IN1("xyz", "hello abc world")
+    False
+    """
+    try:
+        return a in b
+    except TypeError:
+        return False
+
+
+def IN2(a, b):
+    """
+    >>> IN2(1, [1,2,3])
+    False
+    >>> IN2([1,2,3], 1)
+    True
+    >>> IN2([2,3], 1)
+    False
+    >>> IN2("hello abc world", "abc")
+    True
+    >>> IN2("hello abc world", "xyz")
+    False
+    """
+    try:
+        return b in a
+    except TypeError:
+        return False
 
 
 def compare_regexp(a, b):
@@ -71,6 +138,77 @@ def compare_regexp_substr(a, b):
         elif isinstance(b, str):
             return re.search(b, a) is not None
     return EQ(a, b)
+
+
+def compare_fnmatch(a, b):
+    """
+    >>> compare_fnmatch("world", "worl?")
+    True
+    >>> compare_fnmatch("world", "word*")
+    False
+    >>> compare_fnmatch("world", "wor*d")
+    True
+    >>> compare_fnmatch("world", "?or??")
+    True
+    >>> compare_fnmatch("world", "?and?")
+    False
+    >>> compare_fnmatch(1, 2)
+    False
+    """
+    if isinstance(a, str) and isinstance(b, str):
+        return fnmatch.fnmatch(a, b)
+    return EQ(a, b)
+
+
+def compare_range(a, b):
+    """
+    >>> compare_range(1, "-10")
+    True
+    >>> compare_range(1, "10-")
+    False
+    >>> compare_range(20, "-10")
+    False
+    >>> compare_range(1, "10-20")
+    False
+    >>> compare_range(1.0, "0-1.0")
+    True
+    >>> compare_range(100, "-")
+    True
+    >>> compare_range("b", "a-z")
+    True
+    >>> compare_range("b", "b")
+    True
+    >>> compare_range("b", "a")
+    False
+    """
+    if "-" not in b:
+        return a == type(a)(b)
+    bmin, bmax = b.split("-", 1)
+    if bmin not in (None, "") and type(a)(bmin) > a:
+        return False
+    if bmax not in (None, "") and type(a)(bmax) < a:
+        return False
+    return True
+
+
+def compare_eval(a, b):
+    """
+    >>> compare_eval(1, "x%2==1")
+    True
+    >>> compare_eval(1, "0<x/3 and x/3 <=1.0")
+    True
+    >>> compare_eval("xyz", "len(x)==3")
+    True
+    >>> compare_eval("xyz", 'hash(x)!=hash("xyz")')
+    False
+    >>> compare_eval("xyz", 'x[2]=="z"')
+    True
+    >>> compare_eval("xyzxyz", 'x[:int(len(x)/2)]==x[int(len(x)/2):]')
+    True
+    >>> compare_eval("xyzxyz123123", 'x[:int(len(x)/2)]==x[int(len(x)/2):]')
+    False
+    """
+    return eval(b, {}, {"x": a})
 
 
 def compare_subset(a, b, key_fn=EQ, val_fn=EQ):
@@ -144,6 +282,14 @@ def compare_superset(a, b, key_fn=EQ, val_fn=EQ):
 
 
 def compare_set(a, b, key_fn=EQ, val_fn=EQ):
+    """
+    >>> compare_set({"a":"b", "c":"d"}, {"a":"b", "c":"d"})
+    True
+    >>> compare_set({"a":"b", "c":"d"}, {"a":"b"})
+    False
+    >>> compare_set({"a":"b"}, {"a":"b", "c":"d"})
+    False
+    """
     return compare_subset(a, b, key_fn, val_fn) and compare_superset(a, b, key_fn, val_fn)
 
 
@@ -159,6 +305,11 @@ class JsonFind:
 
     @classmethod
     def get_children_attr(cls, obj):
+        """
+        >>> class A: hello="world"
+        >>> list(filter(lambda f: not f[0].startswith("_"), JsonFind.get_children_attr(A)))
+        [('hello', 'world')]
+        """
         return obj.__dict__.items()
 
     @classmethod

@@ -1,10 +1,11 @@
+from ._version import VERSION
 import sys
 import functools
 import click
 import json
 from logging import getLogger, basicConfig, INFO, DEBUG
-from .jsonfind import JsonFind, format_list, find_format_list, EQ, IS, compare_regexp, compare_regexp_substr
-from ._version import VERSION
+from .jsonfind import JsonFind, format_list, find_format_list, EQ, IS, IN1, IN2
+from .jsonfind import compare_regexp, compare_regexp_substr, compare_eval, compare_fnmatch, compare_range
 
 log = getLogger(__name__)
 
@@ -121,8 +122,19 @@ def find_regex(verbose, obj, target, format):
 compare_fn = {
     "eq": EQ,
     "is": IS,
+    "in1": IN1,
+    "in2": IN2,
     "match": compare_regexp,
     "sub": compare_regexp_substr,
+    "eval": compare_eval,
+    "fnmatch": compare_fnmatch,
+    "range": compare_range,
+}
+
+filter_fn = {
+    "sub": JsonFind.filter_compare_subset,
+    "super": JsonFind.filter_compare_superset,
+    "set": JsonFind.filter_compare,
 }
 
 
@@ -130,17 +142,13 @@ compare_fn = {
 @obj_option
 @click.option("--key", type=click.Choice(compare_fn.keys()), default="eq")
 @click.option("--value", type=click.Choice(compare_fn.keys()), default="eq")
-@click.option("--mode", type=click.Choice(["sub", "super", "set"]), default="set")
+@click.option("--mode", type=click.Choice(filter_fn.keys()), default="set")
 def find_any(verbose, obj, target, format, key, value, mode):
     log.debug("finding(regex val) %s from %s (key=%s, value=%s, mode=%s)",
               target, obj, key, value, mode)
-    cmpfn = JsonFind.filter_compare
     key_fn = compare_fn.get(key)
     val_fn = compare_fn.get(value)
-    if mode == "sub":
-        cmpfn = JsonFind.filter_compare_subset
-    elif mode == "super":
-        cmpfn = JsonFind.filter_compare_superset
+    cmpfn = filter_fn.get(mode)
     result = [JsonFind.format_to(format, x)
               for x in cmpfn(obj, target, key_fn, val_fn)]
     log.debug("result: %s", result)
