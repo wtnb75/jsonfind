@@ -6,11 +6,14 @@
 >>> JsonFind.to_jsonpath(JsonFind.find_eq(obj, tgt))
 'c'
 """
-import re
+
 import fnmatch
+import re
 from logging import getLogger
-import jsonpointer
+
 import jsonpath
+import jsonpointer
+
 try:
     import pyjq
 except (ModuleNotFoundError, ImportError):
@@ -186,9 +189,7 @@ def compare_range(a, b):
     bmin, bmax = b.split("-", 1)
     if bmin not in (None, "") and type(a)(bmin) > a:
         return False
-    if bmax not in (None, "") and type(a)(bmax) < a:
-        return False
-    return True
+    return not (bmax not in (None, "") and type(a)(bmax) < a)
 
 
 def compare_eval(a, b):
@@ -290,11 +291,12 @@ def compare_set(a, b, key_fn=EQ, val_fn=EQ):
     >>> compare_set({"a":"b"}, {"a":"b", "c":"d"})
     False
     """
-    return compare_subset(a, b, key_fn, val_fn) and compare_superset(a, b, key_fn, val_fn)
+    return compare_subset(a, b, key_fn, val_fn) and compare_superset(
+        a, b, key_fn, val_fn
+    )
 
 
 class JsonFind:
-
     @classmethod
     def get_children(cls, obj):
         if isinstance(obj, dict):
@@ -317,9 +319,12 @@ class JsonFind:
         if isinstance(target, dict) and isinstance(obj, dict):
             if obj.items() >= target.items():
                 return True
-        elif isinstance(target, (list, tuple)) and isinstance(obj, (list, tuple)):
-            if all(x in obj for x in target):
-                return True
+        elif (
+            isinstance(target, (list, tuple))
+            and isinstance(obj, (list, tuple))
+            and all(x in obj for x in target)
+        ):
+            return True
         return False
 
     @classmethod
@@ -409,8 +414,10 @@ class JsonFind:
         return
 
     @classmethod
-    def filter_key(cls, obj, target, prev=[]):
-        if prev[-len(target):] == target:
+    def filter_key(cls, obj, target, prev=None):
+        if prev is None:
+            prev = []
+        if prev[-len(target) :] == target:
             yield []
             return
         for k, v in cls.get_children(obj):
@@ -443,7 +450,7 @@ class JsonFind:
         return next(cls.filter_superset(obj, target), None)
 
     @classmethod
-    def find_key(cls, obj, target, prev=[]):
+    def find_key(cls, obj, target, prev=None):
         return next(cls.filter_key(obj, target, prev), None)
 
     @classmethod
@@ -453,9 +460,9 @@ class JsonFind:
             if isinstance(i, str):
                 res += "." + i
             elif isinstance(i, int):
-                res += "[{}]".format(i)
+                res += f"[{i}]"
             else:
-                raise Exception("invalid type: {} ({})".format(i, val))
+                raise TypeError(f"invalid type: {i} ({val})")
         return res.lstrip(".")
 
     @classmethod
@@ -471,7 +478,7 @@ class JsonFind:
 
     @classmethod
     def format_to(cls, mode, val):
-        fn = getattr(cls, "to_{}".format(mode))
+        fn = getattr(cls, f"to_{mode}")
         return fn(val)
 
     @classmethod
@@ -487,8 +494,9 @@ class JsonFind:
         return None
 
 
-format_list = [x.split("_", 1)[-1]
-               for x in filter(lambda f: f.startswith("to_"), dir(JsonFind))]
+format_list = [
+    x.split("_", 1)[-1] for x in filter(lambda f: f.startswith("to_"), dir(JsonFind))
+]
 find_format_list = [*format_list]
 if pyjq is not None and "jq" not in find_format_list:
     find_format_list.append("jq")
