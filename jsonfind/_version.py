@@ -1,1 +1,2 @@
-VERSION = '0.1-master'
+# DO NOT EDIT
+VERSION = "0.1.dev1"
